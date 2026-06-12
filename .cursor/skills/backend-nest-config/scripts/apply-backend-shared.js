@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const IS_WINDOWS = process.platform === 'win32';
 const fs = require('node:fs');
 const fsp = fs.promises;
 const path = require('node:path');
@@ -210,7 +211,7 @@ function resolveMissingDeps(scope) {
 
 function runNpm(args, label) {
   log('CMD', `npm ${args.join(' ')}`);
-  const res = spawnSync('npm', args, { stdio: 'inherit', cwd: process.cwd() });
+  const res = spawnSync('npm', args, { stdio: 'inherit', cwd: process.cwd(), shell: IS_WINDOWS });
   if (res.status !== 0) fail(`${label} falhou (exit ${res.status})`);
 }
 

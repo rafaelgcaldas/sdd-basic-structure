@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const IS_WINDOWS = process.platform === "win32";
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -280,7 +281,7 @@ function ensureCommand(command, args, cwd, dryRun) {
     console.log(`[dry-run] Checking command: ${command} ${args.join(" ")}`);
     return;
   }
-  const result = spawnSync(command, args, { cwd, encoding: "utf8" });
+  const result = spawnSync(command, args, { cwd, encoding: "utf8", shell: IS_WINDOWS });
   if (result.error) {
     throw new Error(`Command not available: ${command}`);
   }
@@ -290,7 +291,7 @@ function ensureCommand(command, args, cwd, dryRun) {
 }
 
 function commandExists(command) {
-  const result = spawnSync(command, ["--version"], { encoding: "utf8" });
+  const result = spawnSync(command, ["--version"], { encoding: "utf8", shell: IS_WINDOWS });
   return !result.error && result.status === 0;
 }
 
@@ -308,6 +309,7 @@ function runCommand(command, args, options) {
     cwd,
     stdio: "inherit",
     env: process.env,
+    shell: IS_WINDOWS,
   });
 
   if (result.error) {

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const IS_WINDOWS = process.platform === 'win32';
 const fs = require('node:fs');
 const fsp = fs.promises;
 const path = require('node:path');
@@ -110,6 +111,7 @@ function createFallbackSkillRunOps({ dryRun }) {
       const result = spawnSync(command, args, {
         cwd,
         stdio: 'inherit',
+        shell: IS_WINDOWS,
       });
 
       if (result.error) {

@@ -1,0 +1,25 @@
+{
+  "name": "@sdd/sdd",
+  "private": true,
+  "scripts": {
+    "build": "npm --workspace packages/shared run build && concurrently --kill-others-on-fail \"npm --workspace apps/backend run build\" \"npm --workspace apps/frontend run build\"",
+    "dev": "concurrently --kill-others-on-fail \"npm --workspace apps/backend run dev\" \"npm --workspace apps/frontend run dev\" \"npm --workspace packages/shared run dev\"",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "prettier": "^3.7.4",
+    "turbo": "^2.9.18",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@10.9.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

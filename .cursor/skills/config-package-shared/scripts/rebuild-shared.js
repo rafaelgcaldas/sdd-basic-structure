@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 
+const IS_WINDOWS = process.platform === 'win32';
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const ROOT_DIR = process.cwd();
-const SKILL_DIR = path.join(ROOT_DIR, '.agents', 'skills', 'config-package-shared');
+const SKILL_DIR = (() => {
+  const candidates = [
+    path.join(ROOT_DIR, '.cursor', 'skills', 'config-package-shared'),
+    path.join(ROOT_DIR, '.agents', 'skills', 'config-package-shared'),
+  ];
+  return candidates.find((p) => fs.existsSync(p)) || candidates[0];
+})();
 const TEMPLATE_DIR = path.join(SKILL_DIR, 'assets', 'shared-template');
 const TEMP_SCOPE = '@temp';
 const TEMP_PACKAGE_NAME = `${TEMP_SCOPE}/shared`;
@@ -305,6 +312,7 @@ function runCommand(command, args) {
     cwd: ROOT_DIR,
     stdio: 'inherit',
     env: process.env,
+    shell: IS_WINDOWS,
   });
 
   if (result.status !== 0) {
@@ -374,7 +382,13 @@ function main() {
   }
 
   runCommand('npm', ['i']);
-  runCommand('npx', ['turbo', 'run', 'build', '--filter', sharedPackageName]);
+  if (IS_WINDOWS) {
+    const relPackageDir = path.relative(ROOT_DIR, targetDir);
+    const workspaceArg = relPackageDir.replace(/\\/g, '/');
+    runCommand('npm', ['--workspace', workspaceArg, 'run', 'build']);
+  } else {
+    runCommand('npx', ['turbo', 'run', 'build', '--filter', sharedPackageName]);
+  }
 
   console.log('');
   console.log(`Scope detectado: ${scope}`);
