@@ -11,6 +11,7 @@
   "devDependencies": {
     "concurrently": "^10.0.3",
     "prettier": "^3.7.4",
+    "ts-node": "^10.9.2",
     "turbo": "^2.9.18",
     "typescript": "5.9.2"
   },
@@ -20,6 +21,7 @@
   "packageManager": "npm@10.9.4",
   "workspaces": [
     "apps/*",
+    "modules/*",
     "packages/*"
   ]
 }

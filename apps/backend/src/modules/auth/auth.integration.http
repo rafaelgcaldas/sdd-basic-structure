@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:4000
+@scenarioVersion = {{$timestamp}}
+
+### Registrar usuário com dados válidos — espera 201
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Maria Silva",
+  "email": "maria.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Registrar usuário com e-mail já cadastrado — espera 409
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Maria Silva",
+  "email": "maria.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Registrar usuário sem nome — espera 422
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "novo.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Registrar usuário sem e-mail — espera 422
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "João Souza",
+  "email": "",
+  "password": "Strong@Pass1"
+}
+
+### Registrar usuário com senha fraca — espera 422
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "João Souza",
+  "email": "joao.{{scenarioVersion}}@example.com",
+  "password": "123456"
+}
