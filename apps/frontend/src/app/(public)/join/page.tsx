@@ -1,17 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { getMessage } from '@/shared/i18n';
 import type { ApiErrorResponse } from '@/shared/types/api-error.type';
+import { useAuth } from '@/modules/auth';
 
 type Mode = 'register' | 'login';
 
 export default function JoinPage() {
   const [mode, setMode] = useState<Mode>('register');
+  const { status } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/example/dashboard');
+    }
+  }, [status, router]);
+
+  if (status === 'loading' || status === 'authenticated') return null;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-black px-6 text-white">
@@ -148,14 +160,49 @@ function RegisterForm() {
 }
 
 function LoginForm() {
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+
+    const email = data.get('email') as string;
+    const password = data.get('password') as string;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        },
+      );
+
+      if (response.ok) {
+        const body = await response.json() as { token: string };
+        login(body.token);
+        router.push('/example/dashboard');
+        return;
+      }
+
+      const body: ApiErrorResponse = await response.json();
+      for (const code of body.errors) {
+        toast.error(getMessage(code));
+      }
+    } catch {
+      toast.error(getMessage('DEFAULT_API_ERROR'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        toast.info('Login em breve');
-      }}
-      className="flex w-full flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-2">
         <label htmlFor="login-email" className="text-sm font-medium text-white/70">
           E-mail
@@ -166,6 +213,7 @@ function LoginForm() {
           type="email"
           placeholder="maria@exemplo.com"
           required
+          disabled={loading}
           className="border-white/10 bg-white/5 text-white placeholder:text-white/30 focus-visible:ring-amber-400"
         />
       </div>
@@ -180,6 +228,7 @@ function LoginForm() {
           type="password"
           placeholder="••••••••"
           required
+          disabled={loading}
           className="border-white/10 bg-white/5 text-white placeholder:text-white/30 focus-visible:ring-amber-400"
         />
       </div>
@@ -187,9 +236,10 @@ function LoginForm() {
       <Button
         type="submit"
         size="lg"
-        className="mt-2 w-full bg-amber-400 font-bold text-black hover:bg-amber-300"
+        disabled={loading}
+        className="mt-2 w-full bg-amber-400 font-bold text-black hover:bg-amber-300 disabled:opacity-60"
       >
-        Entrar
+        {loading ? 'Entrando...' : 'Entrar'}
       </Button>
     </form>
   );

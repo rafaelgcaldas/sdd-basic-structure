@@ -1,7 +1,14 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { RegisterUser, type RegisterUserIn } from '@sdd/auth';
+import { ConfigService } from '@nestjs/config';
+import {
+  LoginUser,
+  type LoginUserIn,
+  RegisterUser,
+  type RegisterUserIn,
+} from '@sdd/auth';
 import { Public } from '../../shared/decorators/public.decorator';
 import { BcryptCryptoProvider } from './bcrypt.crypto';
+import { signUserToken } from './jwt.util';
 import { PrismaUserRepository } from './user.prisma';
 
 @Controller('auth')
@@ -9,6 +16,7 @@ export class AuthController {
   constructor(
     private readonly userRepository: PrismaUserRepository,
     private readonly cryptoProvider: BcryptCryptoProvider,
+    private readonly configService: ConfigService,
   ) {}
 
   @Public()
@@ -17,5 +25,21 @@ export class AuthController {
   async register(@Body() body: RegisterUserIn): Promise<void> {
     const useCase = new RegisterUser(this.userRepository, this.cryptoProvider);
     await useCase.execute(body);
+  }
+
+  @Public()
+  @Post('login')
+  @HttpCode(200)
+  async login(@Body() body: LoginUserIn): Promise<{
+    token: string;
+    user: { id: string; name: string; email: string };
+  }> {
+    const useCase = new LoginUser(this.userRepository, this.cryptoProvider);
+    const user = await useCase.execute(body);
+
+    const secret = this.configService.get<string>('JWT_SECRET') ?? '';
+    const token = signUserToken(user, secret);
+
+    return { token, user };
   }
 }

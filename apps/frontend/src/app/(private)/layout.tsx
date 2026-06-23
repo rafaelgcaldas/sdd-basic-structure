@@ -6,6 +6,7 @@ import { ShellProvider } from '@/shared/context/shell.context';
 import { AdminShell } from '@/shared/template/admin-shell.component';
 import { AppSidebarNavigation } from '@/shared/navigation/app-sidebar-navigation.component';
 import type { ModuleNavigationEntry } from '@/shared/components/ui/sidebar-menu.component';
+import { AuthGuard, useAuth } from '@/modules/auth';
 
 // ── Rotas ─────────────────────────────────────────────────────────────────────
 
@@ -13,7 +14,6 @@ const EXAMPLE_ROUTE = '/example';
 const EXAMPLE_DASHBOARD_ROUTE = `${EXAMPLE_ROUTE}/dashboard`;
 
 // ── Estrutura de navegação ─────────────────────────────────────────────────────
-// Adicione, remova ou reordene módulos e seções aqui para refletir no menu lateral.
 
 const APP_MODULES: ModuleNavigationEntry[] = [
   {
@@ -44,18 +44,31 @@ const APP_MODULES: ModuleNavigationEntry[] = [
 
 // ──────────────────────────────────────────────────────────────────────────────
 
-export default function PrivateGroupLayout({ children }: { children: React.ReactNode }) {
+function PrivateShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const auth = useAuth();
 
   return (
     <ShellProvider defaultOpen>
-      {/* TODO: adicionar guard de autenticação se necessário */}
       <AdminShell
         sidebar={<AppSidebarNavigation modules={APP_MODULES} defaultModuleId="example" />}
-        onLogout={() => router.push('/')}
+        userName={auth.user?.name}
+        userEmail={auth.user?.email}
+        onLogout={() => {
+          auth.logout();
+          router.push('/join');
+        }}
       >
         {children}
       </AdminShell>
     </ShellProvider>
+  );
+}
+
+export default function PrivateGroupLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthGuard>
+      <PrivateShell>{children}</PrivateShell>
+    </AuthGuard>
   );
 }

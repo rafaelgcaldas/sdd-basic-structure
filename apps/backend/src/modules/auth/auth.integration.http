@@ -50,3 +50,62 @@ Content-Type: application/json
   "email": "joao.{{scenarioVersion}}@example.com",
   "password": "123456"
 }
+
+# ── Login ─────────────────────────────────────────────────────────────────────
+# Pré-requisito: cadastrar o usuário abaixo via /auth/register antes de testar login.
+@loginEmail = login.test@example.com
+@loginPassword = Strong@Pass1
+
+### Registrar usuário para cenários de login — espera 201
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Login Test",
+  "email": "{{loginEmail}}",
+  "password": "{{loginPassword}}"
+}
+
+### Login com credenciais válidas — espera 200 com token e user
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{loginEmail}}",
+  "password": "{{loginPassword}}"
+}
+
+### Login com e-mail inexistente — espera 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ghost@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Login com senha incorreta — espera 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{loginEmail}}",
+  "password": "WrongPass1!"
+}
+
+### Login com e-mail inválido — espera 422
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "Strong@Pass1"
+}
+
+### Login com corpo incompleto (sem senha) — espera 422
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{loginEmail}}"
+}
