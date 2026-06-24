@@ -1,0 +1,163 @@
+@baseUrl = http://localhost:4000
+@scenarioVersion = {{$timestamp}}
+
+# ── Autenticação (pré-requisito para os endpoints protegidos) ─────────────────
+
+### Registrar usuário admin para testes de produto — espera 201
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin Produto",
+  "email": "admin.produto.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Login para obter token — espera 200 com token
+# @name loginResponse
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin.produto.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+@token = {{loginResponse.response.body.token}}
+
+# ── POST /products — criação ──────────────────────────────────────────────────
+
+### Criar produto com dados válidos — espera 201
+# @name createProduct
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Produto Teste {{scenarioVersion}}",
+  "description": "Uma boa descrição do produto",
+  "price": 49.99,
+  "status": "active",
+  "availableOnline": true,
+  "featured": false,
+  "allowsPreOrder": false
+}
+
+### Criar produto sem token — espera 401
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Produto Sem Token",
+  "price": 10.0,
+  "status": "active"
+}
+
+### Criar produto com nome inválido (vazio) — espera 422
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "price": 10.0,
+  "status": "active"
+}
+
+### Criar produto com preço negativo — espera 422
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Produto Preço Negativo",
+  "price": -5.00,
+  "status": "active"
+}
+
+### Criar produto com status fora do enum — espera 422
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Produto Status Inválido",
+  "price": 10.0,
+  "status": "published"
+}
+
+### Criar produto com preço com mais de 2 casas decimais — espera 422
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Produto Preço Impreciso",
+  "price": 10.999,
+  "status": "active"
+}
+
+# ── GET /products — listagem paginada ─────────────────────────────────────────
+
+### Listar produtos sem token — espera 401
+GET {{baseUrl}}/products
+
+### Listar produtos autenticado — espera 200 com data, total, page, perPage
+GET {{baseUrl}}/products
+Authorization: Bearer {{token}}
+
+### Listar produtos com paginação explícita — espera 200
+GET {{baseUrl}}/products?page=1&perPage=5
+Authorization: Bearer {{token}}
+
+# ── GET /products/:id — busca por id ──────────────────────────────────────────
+
+### Buscar produto por id inexistente — espera 404
+GET {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+Authorization: Bearer {{token}}
+
+### Buscar produto sem token — espera 401
+GET {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+
+# ── PUT /products/:id — atualização ───────────────────────────────────────────
+
+### Atualizar produto com id inexistente — espera 422 (create com UUID inválido ou 404)
+PUT {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Produto Inexistente",
+  "price": 10.0,
+  "status": "active"
+}
+
+### Atualizar produto sem token — espera 401
+PUT {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+Content-Type: application/json
+
+{
+  "name": "Produto Sem Token",
+  "price": 10.0,
+  "status": "active"
+}
+
+### Atualizar produto com nome inválido — espera 422
+PUT {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "price": 10.0,
+  "status": "active"
+}
+
+# ── DELETE /products/:id — exclusão ───────────────────────────────────────────
+
+### Excluir produto com id inexistente — espera 404
+DELETE {{baseUrl}}/products/00000000-0000-4000-8000-000000000000
+Authorization: Bearer {{token}}
+
+### Excluir produto sem token — espera 401
+DELETE {{baseUrl}}/products/00000000-0000-4000-8000-000000000000

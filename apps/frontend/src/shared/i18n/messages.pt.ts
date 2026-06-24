@@ -22,6 +22,19 @@ export const errorMessagesPt = {
   'user.credentials.invalid': 'E-mail ou senha inválidos.',
   'user.not_found': 'Usuário não encontrado.',
   'user.password.confirmation.mismatch': 'A senha e a confirmação de senha não conferem.',
+  'product.not_found': 'Produto não encontrado.',
+  'product.name.required': 'O nome do produto é obrigatório.',
+  'product.name.min.length': 'O nome deve ter no mínimo 2 caracteres.',
+  'product.name.max.length': 'O nome deve ter no máximo 120 caracteres.',
+  'product.description.max.length': 'A descrição deve ter no máximo 500 caracteres.',
+  'product.price.required': 'O preço é obrigatório.',
+  'product.price.min.value': 'O preço não pode ser negativo.',
+  'product.price.precision': 'O preço deve ter no máximo 2 casas decimais.',
+  'product.status.required': 'O status é obrigatório.',
+  'product.status.in': 'O status deve ser ativo, inativo ou rascunho.',
+  'product.status.active': 'Ativo',
+  'product.status.inactive': 'Inativo',
+  'product.status.draft': 'Rascunho',
 } as const;
 
 export type ErrorMessageKey = keyof typeof errorMessagesPt;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Users } from 'lucide-react';
+import { LayoutDashboard, Package, Users } from 'lucide-react';
 import { ShellProvider } from '@/shared/context/shell.context';
 import { AdminShell } from '@/shared/template/admin-shell.component';
 import { AppSidebarNavigation } from '@/shared/navigation/app-sidebar-navigation.component';
@@ -14,6 +14,8 @@ const EXAMPLE_ROUTE = '/example';
 const EXAMPLE_DASHBOARD_ROUTE = `${EXAMPLE_ROUTE}/dashboard`;
 const AUTH_ROUTE = '/auth';
 const USERS_ROUTE = `${AUTH_ROUTE}/users`;
+const CATALOG_ROUTE = '/catalog';
+const PRODUCTS_ROUTE = `${CATALOG_ROUTE}/products`;
 
 // ── Estrutura de navegação ─────────────────────────────────────────────────────
 
@@ -60,6 +62,30 @@ const APP_MODULES: ModuleNavigationEntry[] = [
             label: 'Usuários',
             href: USERS_ROUTE,
             icon: Users,
+            match: 'prefix',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    item: {
+      id: 'catalog',
+      label: 'Catálogo',
+      shortLabel: 'Cat',
+      href: PRODUCTS_ROUTE,
+      icon: Package,
+    },
+    sections: [
+      {
+        id: 'catalog-main',
+        label: 'Catálogo',
+        items: [
+          {
+            id: 'catalog-products',
+            label: 'Produtos',
+            href: PRODUCTS_ROUTE,
+            icon: Package,
             match: 'prefix',
           },
         ],
