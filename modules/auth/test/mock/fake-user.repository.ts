@@ -2,7 +2,11 @@ import { User } from "../../src/user/model";
 import { UserPageParams, UserRepository } from "../../src/user/provider";
 
 export class FakeUserRepository implements UserRepository {
-  readonly users: User[] = [];
+  readonly users: User[];
+
+  constructor(initialUsers: User[] = []) {
+    this.users = [...initialUsers];
+  }
 
   async create(user: User): Promise<User> {
     this.users.push(user);

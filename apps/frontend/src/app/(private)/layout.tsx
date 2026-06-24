@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Users } from 'lucide-react';
 import { ShellProvider } from '@/shared/context/shell.context';
 import { AdminShell } from '@/shared/template/admin-shell.component';
 import { AppSidebarNavigation } from '@/shared/navigation/app-sidebar-navigation.component';
@@ -12,6 +12,8 @@ import { AuthGuard, useAuth } from '@/modules/auth';
 
 const EXAMPLE_ROUTE = '/example';
 const EXAMPLE_DASHBOARD_ROUTE = `${EXAMPLE_ROUTE}/dashboard`;
+const AUTH_ROUTE = '/auth';
+const USERS_ROUTE = `${AUTH_ROUTE}/users`;
 
 // ── Estrutura de navegação ─────────────────────────────────────────────────────
 
@@ -35,6 +37,30 @@ const APP_MODULES: ModuleNavigationEntry[] = [
             href: EXAMPLE_DASHBOARD_ROUTE,
             icon: LayoutDashboard,
             match: 'exact',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    item: {
+      id: 'auth',
+      label: 'Administração',
+      shortLabel: 'Admin',
+      href: USERS_ROUTE,
+      icon: Users,
+    },
+    sections: [
+      {
+        id: 'auth-main',
+        label: 'Administração',
+        items: [
+          {
+            id: 'auth-users',
+            label: 'Usuários',
+            href: USERS_ROUTE,
+            icon: Users,
+            match: 'prefix',
           },
         ],
       },

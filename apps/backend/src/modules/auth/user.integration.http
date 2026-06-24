@@ -1,0 +1,169 @@
+@baseUrl = http://localhost:4000
+@scenarioVersion = {{$timestamp}}
+
+# ── Autenticação (pré-requisito para os endpoints protegidos) ─────────────────
+
+### Registrar usuário admin para cenários de CRUD — espera 201
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin Test",
+  "email": "admin.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Login para obter token — espera 200 com token
+# @name loginResponse
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+@token = {{loginResponse.response.body.token}}
+
+# ── GET /users — listagem paginada ────────────────────────────────────────────
+
+### Listar usuários sem token — espera 401
+GET {{baseUrl}}/users
+
+### Listar usuários autenticado — espera 200 com data, total, page, perPage
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### Listar com paginação explícita — espera 200
+GET {{baseUrl}}/users?page=1&perPage=5
+Authorization: Bearer {{token}}
+
+# ── POST /users — criação ─────────────────────────────────────────────────────
+
+### Criar usuário com dados válidos — espera 201
+# @name createUserResponse
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Carlos Mendes",
+  "email": "carlos.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Criar usuário sem token — espera 401
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Carlos Mendes",
+  "email": "carlos.anon@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Criar usuário sem nome — espera 422
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "email": "sem.nome.{{scenarioVersion}}@example.com",
+  "password": "Strong@Pass1"
+}
+
+### Criar usuário sem email — espera 422
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Sem Email",
+  "email": "",
+  "password": "Strong@Pass1"
+}
+
+### Criar usuário sem senha — espera 422
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Sem Senha",
+  "email": "sem.senha.{{scenarioVersion}}@example.com"
+}
+
+# ── GET /users/:id — busca por id ─────────────────────────────────────────────
+
+### Buscar usuário por id (precisa rodar criação acima primeiro e copiar o id)
+# Substitua <USER_ID> pelo id retornado na listagem após a criação
+GET {{baseUrl}}/users/<USER_ID>
+Authorization: Bearer {{token}}
+
+### Buscar usuário com id inexistente — espera 404
+GET {{baseUrl}}/users/00000000-0000-4000-8000-000000000000
+Authorization: Bearer {{token}}
+
+### Buscar usuário sem token — espera 401
+GET {{baseUrl}}/users/00000000-0000-4000-8000-000000000000
+
+# ── PUT /users/:id — atualização ──────────────────────────────────────────────
+
+### Atualizar usuário mantendo senha atual (password vazio) — espera 204
+# Substitua <USER_ID> pelo id do usuário criado
+PUT {{baseUrl}}/users/<USER_ID>
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Carlos Atualizado",
+  "email": "carlos.atualizado.{{scenarioVersion}}@example.com",
+  "password": ""
+}
+
+### Atualizar senha do usuário — espera 204
+PUT {{baseUrl}}/users/<USER_ID>
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Carlos Atualizado",
+  "email": "carlos.atualizado.{{scenarioVersion}}@example.com",
+  "password": "NewStrong@Pass1"
+}
+
+### Atualizar usuário sem token — espera 401
+PUT {{baseUrl}}/users/<USER_ID>
+Content-Type: application/json
+
+{
+  "name": "Carlos Atualizado",
+  "email": "carlos@example.com",
+  "password": ""
+}
+
+### Atualizar usuário sem nome — espera 422
+PUT {{baseUrl}}/users/<USER_ID>
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "email": "carlos@example.com",
+  "password": ""
+}
+
+# ── DELETE /users/:id — exclusão ──────────────────────────────────────────────
+
+### Excluir usuário — espera 204
+# Substitua <USER_ID> pelo id do usuário criado
+DELETE {{baseUrl}}/users/<USER_ID>
+Authorization: Bearer {{token}}
+
+### Excluir usuário sem token — espera 401
+DELETE {{baseUrl}}/users/<USER_ID>
+
+### Excluir usuário com id inexistente — espera 204 (idempotente)
+DELETE {{baseUrl}}/users/00000000-0000-4000-8000-000000000000
+Authorization: Bearer {{token}}

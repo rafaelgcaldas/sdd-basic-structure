@@ -20,6 +20,8 @@ export const errorMessagesPt = {
   'user.password.strong.password': 'A senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial.',
   'user.password.no.common.password': 'Esta senha é muito comum. Escolha uma senha mais segura.',
   'user.credentials.invalid': 'E-mail ou senha inválidos.',
+  'user.not_found': 'Usuário não encontrado.',
+  'user.password.confirmation.mismatch': 'A senha e a confirmação de senha não conferem.',
 } as const;
 
 export type ErrorMessageKey = keyof typeof errorMessagesPt;
