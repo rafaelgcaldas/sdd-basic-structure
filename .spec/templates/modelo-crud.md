@@ -46,25 +46,25 @@ Entregar o CRUD de `{{entidade}}` no módulo `{{modulo}}`, com agregado, persist
 
 ### Tasks - Negócio (módulo {{modulo}})
 
-- [ ] Criar o agregado `{{entidade}}` dentro do módulo `{{modulo}}` com a skill [module-aggregate](../../../.claude/skills/module-aggregate).
+- [ ] Criar o agregado `{{entidade}}` dentro do módulo `{{modulo}}` com a skill [module-aggregate](../../../.cursor/skills/module-aggregate).
 
-- [ ] Implementar a entidade `{{Entidade}}` com a skill [module-entity](../../../.claude/skills/module-entity), com os campos: {{campos}}.
+- [ ] Implementar a entidade `{{Entidade}}` com a skill [module-entity](../../../.cursor/skills/module-entity), com os campos: {{campos}}.
 
-- [ ] Definir o contrato do repositório de `{{entidade}}` com a skill [module-repository](../../../.claude/skills/module-repository).
+- [ ] Definir o contrato do repositório de `{{entidade}}` com a skill [module-repository](../../../.cursor/skills/module-repository).
 
-- [ ] Implementar o caso de uso `save-{{entidade}}` com a skill [module-use-case](../../../.claude/skills/module-use-case). A decisão entre criar e atualizar deve ser baseada em uma consulta ao repositório (`findById`): se `id` vier na entrada e `findById` retornar um registro, executa atualização; caso contrário (sem `id` ou registro não encontrado), executa criação usando o `id` recebido ou gerando um novo.
+- [ ] Implementar o caso de uso `save-{{entidade}}` com a skill [module-use-case](../../../.cursor/skills/module-use-case). A decisão entre criar e atualizar deve ser baseada em uma consulta ao repositório (`findById`): se `id` vier na entrada e `findById` retornar um registro, executa atualização; caso contrário (sem `id` ou registro não encontrado), executa criação usando o `id` recebido ou gerando um novo.
 
-- [ ] Implementar o caso de uso `delete-{{entidade}}` com a skill [module-use-case](../../../.claude/skills/module-use-case). Lançar `DomainError("{{entidade}}.not_found", 404)` quando o `id` não existir.
+- [ ] Implementar o caso de uso `delete-{{entidade}}` com a skill [module-use-case](../../../.cursor/skills/module-use-case). Lançar `DomainError("{{entidade}}.not_found", 404)` quando o `id` não existir.
 
 - [ ] Cobrir os dois casos de uso com testes unitários, usando os fakes do módulo (`Fake{{Entidade}}Repository` e demais providers necessários).
 
 ### Tasks - Back-end
 
-- [ ] Sincronizar o módulo `{{modulo}}` com o Prisma criando/atualizando o model da entidade `{{entidade}}` com a skill [backend-prisma-sync-module](../../../.claude/skills/backend-prisma-sync-module).
+- [ ] Sincronizar o módulo `{{modulo}}` com o Prisma criando/atualizando o model da entidade `{{entidade}}` com a skill [backend-prisma-sync-module](../../../.cursor/skills/backend-prisma-sync-module).
 
-- [ ] Implementar o repositório Prisma de `{{entidade}}` em `apps/backend/src/modules/{{modulo}}` com a skill [backend-prisma-repository](../../../.claude/skills/backend-prisma-repository), sem alterar a interface definida no módulo.
+- [ ] Implementar o repositório Prisma de `{{entidade}}` em `apps/backend/src/modules/{{modulo}}` com a skill [backend-prisma-repository](../../../.cursor/skills/backend-prisma-repository), sem alterar a interface definida no módulo.
 
-- [ ] Criar/atualizar `apps/backend/src/modules/{{modulo}}/{{entidade}}.controller.ts` com a skill [backend-nest-controller](../../../.claude/skills/backend-nest-controller), expondo o CRUD em `/{{entidades}}` (criar, atualizar, excluir, obter por id e listar paginado). Endpoints autenticados. Consultas chamam o repositório direto; comandos instanciam o caso de uso correspondente no corpo do método.
+- [ ] Criar/atualizar `apps/backend/src/modules/{{modulo}}/{{entidade}}.controller.ts` com a skill [backend-nest-controller](../../../.cursor/skills/backend-nest-controller), expondo o CRUD em `/{{entidades}}` (criar, atualizar, excluir, obter por id e listar paginado). Endpoints autenticados. Consultas chamam o repositório direto; comandos instanciam o caso de uso correspondente no corpo do método.
 
 - [ ] Criar `apps/backend/src/modules/{{modulo}}/{{entidade}}.integration.http` (Rest Client) cobrindo os fluxos do CRUD, incluindo os principais casos de erro. Validar manualmente com o backend rodando.
 
